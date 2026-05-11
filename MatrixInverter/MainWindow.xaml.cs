@@ -10,7 +10,6 @@ namespace MatrixInverter
     public partial class MainWindow : Window
     {
         private int size = 3;
-        // Додано ініціалізацію за замовчуванням, щоб прибрати попередження CS8618
         private TextBox[,] matrixInputs = new TextBox[0, 0];
         private TextBlock[,] matrixOutputs = new TextBlock[0, 0];
 
@@ -20,7 +19,7 @@ namespace MatrixInverter
             CreateGrids(size);
         }
 
-        // Властивість для діаграми класів
+     
         public MatrixCore MatrixCore { get; set; } = new MatrixCore();
 
         private void CreateGrids(int n)
@@ -109,7 +108,7 @@ namespace MatrixInverter
                 }
                 else // Ньютон-Шульц
                 {
-                    // ВИПРАВЛЕНО CS1615: виклик методу без out, якщо він тепер повертає лише матрицю
+                    
                     inv = MatrixCore.InverseNewtonSchulz(A);
                     iters = 50; // Або інше значення ітерацій для виводу
                 }

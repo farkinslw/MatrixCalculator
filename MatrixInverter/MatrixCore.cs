@@ -66,7 +66,7 @@ namespace MatrixInverter
             return result;
         }
 
-        // --- Допоміжні методи ---
+        //  Допоміжні методи 
         public double[,] Identity(int n)
         {
             double[,] res = new double[n, n];
