@@ -1,7 +1,7 @@
 ﻿<Window x:Class="MatrixInverter.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Matrix Solver" Height="700" Width="1000" WindowStartupLocation="CenterScreen">
+        Title="Matrix Solver" Height="700" Width="1100" WindowStartupLocation="CenterScreen">
 
     <Window.Background>
         <ImageBrush ImageSource="https://images.alphacoders.com/507/thumb-1920-507637.png"/>
@@ -27,11 +27,15 @@
                         </StackPanel>
                         <Button Content="Оновити" Click="BtnUpdate_Click" Background="#8A2BE2" Foreground="White" Width="90" Height="30" Margin="5" BorderThickness="0"/>
                         <Button Content="Random" Click="BtnRandom_Click" Background="#FF69B4" Foreground="White" Width="90" Height="30" Margin="5" BorderThickness="0"/>
-                        <ComboBox x:Name="cmbMethod" Width="160" Margin="10,0" Height="30" VerticalContentAlignment="Center">
+
+                        <ComboBox x:Name="cmbMethod" Width="160" Margin="10,0" Height="30" VerticalContentAlignment="Center" SelectionChanged="cmbMethod_SelectionChanged">
                             <ComboBoxItem Content="Гаус-Жордан" IsSelected="True"/>
-                            <ComboBoxItem Content="Ньютон-Шульц"/>
+                            <ComboBoxItem Content="Хотеллінг-Шульц"/>
                         </ComboBox>
+
                         <Button Content="РАХУВАТИ" Click="BtnCalc_Click" Background="#4B0082" Foreground="White" Width="120" Height="30" FontWeight="Bold" Margin="5" BorderThickness="0"/>
+
+                        <Button Content="ЗБЕРЕГТИ" Click="BtnSave_Click" Background="#20B2AA" Foreground="White" Width="100" Height="30" FontWeight="Bold" Margin="5" BorderThickness="0"/>
                     </StackPanel>
                 </Border>
 

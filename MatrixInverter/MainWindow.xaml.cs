@@ -4,7 +4,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Globalization;
 using System.Diagnostics;
-
+using System.IO;            
+using Microsoft.Win32;      
+using System.Text;          
 namespace MatrixInverter
 {
     public partial class MainWindow : Window
@@ -19,7 +21,6 @@ namespace MatrixInverter
             CreateGrids(size);
         }
 
-     
         public MatrixCore MatrixCore { get; set; } = new MatrixCore();
 
         private void CreateGrids(int n)
@@ -100,17 +101,16 @@ namespace MatrixInverter
 
                 Stopwatch sw = Stopwatch.StartNew();
                 double[,] inv;
-                int iters = 1;
+                int iters = 0;
 
-                if (cmbMethod.SelectedIndex == 0) // Гаусс
+                if (cmbMethod.SelectedIndex == 0) // Гаус-Жордан
                 {
                     inv = MatrixCore.InverseGauss(A);
+                    iters = 1;
                 }
-                else // Ньютон-Шульц
+                else // Хотеллінг-Шульц
                 {
-                    
-                    inv = MatrixCore.InverseNewtonSchulz(A);
-                    iters = 50; // Або інше значення ітерацій для виводу
+                    inv = MatrixCore.InverseNewtonSchulz(A, out iters);
                 }
 
                 sw.Stop();
@@ -122,9 +122,12 @@ namespace MatrixInverter
                 {
                     for (int j = 0; j < size; j++)
                     {
-                        matrixOutputs[i, j].Text = Math.Abs(inv[i, j]) < 0.001 && inv[i, j] != 0
-                            ? inv[i, j].ToString("E2", CultureInfo.InvariantCulture)
-                            : inv[i, j].ToString("F3", CultureInfo.InvariantCulture);
+                        double val = inv[i, j];
+                        if (Math.Abs(val) < 1e-9) val = 0.0;
+
+                        matrixOutputs[i, j].Text = Math.Abs(val) < 0.001 && val != 0
+                            ? val.ToString("E2", CultureInfo.InvariantCulture)
+                            : val.ToString("F3", CultureInfo.InvariantCulture);
                     }
                 }
             }
@@ -138,13 +141,61 @@ namespace MatrixInverter
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Помилка: " + ex.Message);
+                MessageBox.Show("Помилка: " + ex.Message, "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void BtnSave_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (matrixOutputs.GetLength(0) == 0 || matrixOutputs[0, 0].Text == "-")
+                {
+                    MessageBox.Show("Спочатку обчисліть обернену матрицю!", "Увага", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                SaveFileDialog saveFileDialog = new SaveFileDialog();
+                saveFileDialog.Filter = "Текстові файли (*.txt)|*.txt|Усі файли (*.*)|*.*";
+                saveFileDialog.Title = "Зберегти обернену матрицю";
+                saveFileDialog.FileName = "InverseMatrix.txt";
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    for (int i = 0; i < size; i++)
+                    {
+                        for (int j = 0; j < size; j++)
+                        {
+                            sb.Append(matrixOutputs[i, j].Text).Append("\t");
+                        }
+                        sb.AppendLine(); 
+                    }
+
+                    File.WriteAllText(saveFileDialog.FileName, sb.ToString());
+                    MessageBox.Show("Матрицю успішно збережено!", "Успіх", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Помилка при збереженні файлу: " + ex.Message, "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void cmbMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (lblComp == null) return;
+
+            if (cmbMethod.SelectedIndex == 0)
+                lblComp.Text = "Складність: O(n³)";
+            else
+                lblComp.Text = "Складність: O(k · n³)";
         }
 
         private void BtnUp_Click(object sender, RoutedEventArgs e)
         {
-            if (size < 15) { size++; txtSize.Text = size.ToString(); CreateGrids(size); }
+            if (size < 10) { size++; txtSize.Text = size.ToString(); CreateGrids(size); }
         }
 
         private void BtnDown_Click(object sender, RoutedEventArgs e)
